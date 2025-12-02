@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import API from "../api/axios";
+import { getVideoDuration } from "../helper/function";
 
 interface UploadPage {
   setSelectedNav: React.Dispatch<React.SetStateAction<string>>;
@@ -28,6 +29,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
   };
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isAnalyzingComplete, setIsAnalyzingComplete] = useState(false);
+  const [isDurationExceeded, setIsDurationExceeded] = useState(false);
   const handleCancelPost = () => {
     handlePreviewClose();
     setIsAnalyzingComplete(false);
@@ -41,6 +43,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsAnalyzingComplete(false);
     if (event.target.files && event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
       handleFileValidation(selectedFile);
@@ -84,6 +87,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
     setPreview(null);
     if (inputRef.current) inputRef.current.value = "";
     setAnalyzeResult({ isSafe: false, detection: "", url: "" });
+    setIsDurationExceeded(false);
   };
 
   const [analyzeResult, setAnalyzeResult] = useState<{
@@ -125,6 +129,14 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
     }
   };
   const handleAnalyze = async () => {
+    if (!file) return;
+    if (file.type.startsWith("video/")) {
+      const videoDuration = await getVideoDuration(file);
+      if (videoDuration >= 60) {
+        setIsDurationExceeded(true);
+        return;
+      }
+    }
     setIsAnalyzing(true);
     try {
       const formData = new FormData();
@@ -244,6 +256,16 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                 className="animate-slideInUp-enter mb-4 bg-primary-indigo-600 rounded-xl text-small text-white p-3 text-center font-medium hover:scale-[1.01] transition-transform duration-200 cursor-pointer"
               >
                 Analyze with AI
+              </div>
+            </>
+          )}
+          {isDurationExceeded && (
+            <>
+              {/* DURATION EXCEEDED WARNING */}
+              <div className="mb-4 bg-red-100 border border-red-400 text-red-800 text-small p-3 rounded-lg animate-fadeIn-enter">
+                <div className="font-semibold mb-1">Duration Exceeded</div>
+                Videos longer than 60 seconds cannot be analyzed. Please upload
+                a shorter video.
               </div>
             </>
           )}

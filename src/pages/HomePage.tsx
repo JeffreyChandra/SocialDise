@@ -38,9 +38,9 @@ const HomePage = () => {
           </div>
         </div>
         {isLoading ? (
-          <div>
-            <PostSkeleton classname="w-[500px] h-[400px] rounded-lg mb-4" />
-            <PostSkeleton classname="w-[500px] h-[400px] rounded-lg mb-4" />
+          <div className="w-full max-w-[500px] ">
+            <PostSkeleton classname="h-[400px] rounded-lg mb-4" />
+            <PostSkeleton classname="h-[400px] rounded-lg mb-4" />
           </div>
         ) : (
           <div className="w-full max-w-[500px] ">

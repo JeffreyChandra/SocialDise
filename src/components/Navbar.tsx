@@ -25,7 +25,7 @@ const Navbar = () => {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative bg-neutral-bg pb-15">
       <div className="border-b-2 border-neutral-border w-full bg-white">
         <div className="max-w-5xl mx-auto w-full px-2 h-12 flex items-center justify-between bg-white ">
           <div className="flex gap-1 items-center">
@@ -82,7 +82,7 @@ const Navbar = () => {
       <div className="bg-neutral-bg min-h-[calc(100vh-50px)]">
         {navItems.find((item) => item.text === selectedNav)?.component}
       </div>
-      <div className="text-neutral-textSecondary sm:hidden flex items-center justify-around absolute border-t-2 border-neutral-border w-full bg-white h-13 z-10 bottom-0 ">
+      <div className="text-neutral-textSecondary sm:hidden fixed flex items-center justify-around absolute border-t-2 border-neutral-border w-full bg-white h-13 z-10 bottom-0 ">
         {navItems.map((item, index) => (
           <div
             key={index}

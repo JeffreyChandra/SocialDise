@@ -20,7 +20,7 @@ const PostCard = ({ post }: { post: Post }) => {
   };
   return (
     <div className="rounded-lg bg-neutral-whiteSf shadow-[0px_0px_2px_0px_rgba(0,0,0,0.5)] text-small text-neutral-textPrimary mb-5 animate-slideInUp-enter">
-      <div className="flex justify-between items-center  p-2">
+      <div className="flex justify-between items-center p-2">
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-neutral-textSecondary rounded-4xl">
             <User className="w-3.5 h-3.5 stroke-neutral-border" />
