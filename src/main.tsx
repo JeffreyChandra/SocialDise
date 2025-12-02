@@ -2,23 +2,38 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AuthNavbar from "./components/AuthNavbar.tsx";
-import MainNavbar from "./components/MainNavbar.tsx";
-import ProtectedRoute from "./ProtectedRoute.tsx";
+import Layout from "./components/Layout";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <AuthNavbar choose="sign_in" />,
+    path: "/login",
+    element: <LoginPage />,
   },
   {
-    path: "/home",
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/",
     element: (
       <ProtectedRoute>
-        <MainNavbar />
+        <Layout />
       </ProtectedRoute>
     ),
+    errorElement: <div>Halaman Error 404</div>,
+    children: [
+      {
+        path: "/",
+        element: <Navbar />,
+      },
+    ],
   },
 ]);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
