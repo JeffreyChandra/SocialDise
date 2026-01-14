@@ -46,25 +46,27 @@ export class DeepfakeService {
     } | null = null;
     let responseMessage = '';
 
-    if (isSafe) {
-      try {
-        const uploadResult = await this.cloudinaryService.uploadMedia(file);
+    // Always attempt to upload, regardless of safety score
+    try {
+      const uploadResult = await this.cloudinaryService.uploadMedia(file);
 
-        fileInfo = {
-          url: uploadResult.secure_url,
-          format: uploadResult.format,
-          resource_type: uploadResult.resource_type,
-        };
+      fileInfo = {
+        url: uploadResult.secure_url,
+        format: uploadResult.format,
+        resource_type: uploadResult.resource_type,
+      };
+
+      if (isSafe) {
         responseMessage =
           'Upload berhasil. Media terverifikasi aman dan telah disimpan.';
-      } catch (error) {
-        console.error('Gagal upload ke Cloudinary:', error);
-        throw new InternalServerErrorException(
-          'Verifikasi berhasil, namun gagal menyimpan file ke Cloudinary.',
-        );
+      } else {
+        responseMessage = `Upload berhasil, namun terdeteksi deepfake (${detectionResult.message}).`;
       }
-    } else {
-      responseMessage = `Upload dibatalkan. ${detectionResult.message}`;
+    } catch (error) {
+      console.error('Gagal upload ke Cloudinary:', error);
+      throw new InternalServerErrorException(
+        'Gagal menyimpan file ke Cloudinary.',
+      );
     }
 
     return {
