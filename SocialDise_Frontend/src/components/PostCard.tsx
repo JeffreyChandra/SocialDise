@@ -48,7 +48,7 @@ const PostCard = ({ post }: { post: Post }) => {
         )}
         <div className="absolute top-2 right-2 flex gap-1 items-center bg-[#f4fff1] border border-status-success px-2 py-1 rounded-2xl text-[#13843c] font-medium">
           <ShieldCheck className="w-3 h-3 stroke-2" />{" "}
-          <span>Genuine {(1 - Number(post.trustedScore)) * 100}%</span>
+          <span>Genuine {100 - 100 * Number(post.trustedScore)}%</span>
         </div>
       </div>
       <div className=" flex items-center gap-4 text-neutral-textSecondary px-2 py-3">
