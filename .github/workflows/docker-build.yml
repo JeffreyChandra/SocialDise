@@ -1,5 +1,4 @@
 name: Build and Push Docker Image
-# test
 on:
   push:
     branches: ["devops_UAS"]
@@ -23,11 +22,11 @@ jobs:
         with:
           context: ./SocialDise_Backend
           push: true
-          tags: lidann/backend-image:latest
+          tags: Kevin Lidan/backend-image:latest
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v4
         with:
           context: ./SocialDise_Frontend
           push: true
-          tags: lidann/frontend-image:latest
+          tags: Kevin Lidan/frontend-image:latest
