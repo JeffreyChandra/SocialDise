@@ -33,7 +33,11 @@ async function bootstrap() {
 
   // Jika Anda memiliki prefix global, aktifkan di sini:
   // app.setGlobalPrefix('api/v1');
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   console.log(`Application is listening on port ${port}`);
