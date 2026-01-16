@@ -22,11 +22,11 @@ jobs:
         with:
           context: ./SocialDise_Backend
           push: true
-          tags: Kevin Lidan/backend-image:latest
+          tags: lidann/backend-image:latest
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v4
         with:
           context: ./SocialDise_Frontend
           push: true
-          tags: Kevin Lidan/frontend-image:latest
+          tags: lidann/frontend-image:latest
