@@ -106,7 +106,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           content: caption,
           mediaUrl: analyzeResult.url,
           userId: JSON.parse(localStorage.getItem("user")!).id,
-          trustedScore: Number(analyzeResult.detection) * 100,
+          trustedScore: Number(analyzeResult.detection),
         },
         {
           headers: {
