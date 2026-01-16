@@ -17,6 +17,7 @@ interface UploadPage {
   setSelectedNav: React.Dispatch<React.SetStateAction<string>>;
 }
 const UploadPage = ({ setSelectedNav }: UploadPage) => {
+  const [postErrorMessage, setPostErrorMessage] = useState("");
   const [isPreviewClosing, setIsPreviewClosing] = useState(false);
   const handlePreviewClose = () => {
     setIsPreviewClosing(true);
@@ -115,8 +116,9 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
       );
       console.log("Post created successfully:", postRes.data);
       setSelectedNav("Home");
-    } catch (postError) {
-      console.error("Error creating post:", postError);
+    } catch (postError: any) {
+      setPostErrorMessage(postError.message[0]);
+      console.error("Error creating post:", postError.message[0]);
     }
   };
   const [colorScore, setColorScore] = useState("var(--color-status-success)");
@@ -404,6 +406,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                   <Send className="w-4 h-4" /> Post Now
                 </button>
               </div>
+              <div className="text-red-500 text-[14px]">{postErrorMessage}</div>
             </>
           )}
           {/* HOW IT WORKS */}
