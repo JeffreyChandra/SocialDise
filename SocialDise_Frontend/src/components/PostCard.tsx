@@ -47,7 +47,13 @@ const PostCard = ({ post }: { post: Post }) => {
         ) : (
           <img className="object-cover h-full w-full" src={post.mediaUrl}></img>
         )}
-        <div className="absolute top-2 right-2 flex gap-1 items-center bg-[#f4fff1] border border-status-success px-2 py-1 rounded-2xl text-[#13843c] font-medium">
+        <div
+          className={`absolute top-2 right-2 flex gap-1 items-center border ${
+            100 - Number(post.trustedScore) * 100 <= 30
+              ? "bg-[#fee0e0] text-[#841313] border-status-danger]"
+              : "bg-[#f4fff1] border-status-success text-[#13843c]"
+          }  px-2 py-1 rounded-2xl font-medium`}
+        >
           <ShieldCheck className="w-3 h-3 stroke-2" />{" "}
           <span>Genuine {100 - Number(post.trustedScore) * 100}%</span>
         </div>
