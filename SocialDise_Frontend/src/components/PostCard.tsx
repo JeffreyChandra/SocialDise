@@ -9,6 +9,7 @@ import {
 import type { Post } from "../helper/interface";
 
 const PostCard = ({ post }: { post: Post }) => {
+  console.log("ini post card:" + post);
   const getMediaType = (url: string) => {
     const cleanUrl = url.toLowerCase().split("?")[0];
     if (/\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$/.test(cleanUrl)) {

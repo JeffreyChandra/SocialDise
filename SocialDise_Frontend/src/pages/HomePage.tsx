@@ -22,7 +22,6 @@ const HomePage = () => {
   useEffect(() => {
     fetchPosts();
   }, []);
-  console.log(posts);
   return (
     <div className="grid grid-cols-12 w-full gap-x-6 bg-neutral-bg py-4">
       <div className="px-2 col-span-12 flex flex-col gap-y-4 items-center">
