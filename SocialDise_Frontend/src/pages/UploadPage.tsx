@@ -17,7 +17,7 @@ interface UploadPage {
   setSelectedNav: React.Dispatch<React.SetStateAction<string>>;
 }
 const UploadPage = ({ setSelectedNav }: UploadPage) => {
-  const [postErrorMessage, setPostErrorMessage] = useState("");
+  // const [postErrorMessage, setPostErrorMessage] = useState("");
   const [isPreviewClosing, setIsPreviewClosing] = useState(false);
   const handlePreviewClose = () => {
     setIsPreviewClosing(true);
@@ -117,7 +117,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
       console.log("Post created successfully:", postRes.data);
       setSelectedNav("Home");
     } catch (postError: any) {
-      setPostErrorMessage(postError);
+      // setPostErrorMessage(postError);
       console.error("Error creating post:", postError.message[0]);
     }
   };
