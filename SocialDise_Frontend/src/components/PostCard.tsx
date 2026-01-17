@@ -9,7 +9,7 @@ import {
 import type { Post } from "../helper/interface";
 
 const PostCard = ({ post }: { post: Post }) => {
-  console.log("ini post card:" + post);
+  console.log("ini post card:" + post.trustedScore);
   const getMediaType = (url: string) => {
     const cleanUrl = url.toLowerCase().split("?")[0];
     if (/\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$/.test(cleanUrl)) {
@@ -30,7 +30,7 @@ const PostCard = ({ post }: { post: Post }) => {
             <div className="font-semibold">{post.user.name}</div>
             <div className="text-neutral-textSecondary">
               {post.user.email}{" "}
-              <span className="text-[0.4rem] align-middle">&bull;</span> 1h ago
+              <span className="text-[0.4rem] align-middle">&bull;</span> 2h ago
             </div>
           </div>
         </div>

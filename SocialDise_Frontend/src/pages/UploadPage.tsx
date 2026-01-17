@@ -117,7 +117,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
       console.log("Post created successfully:", postRes.data);
       setSelectedNav("Home");
     } catch (postError: any) {
-      setPostErrorMessage(postError.message[0]);
+      setPostErrorMessage(postError);
       console.error("Error creating post:", postError.message[0]);
     }
   };
@@ -406,7 +406,7 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                   <Send className="w-4 h-4" /> Post Now
                 </button>
               </div>
-              <div className="text-red-500 text-[14px]">{postErrorMessage}</div>
+              {/* <div className="text-red-500 text-[14px]">{postErrorMessage}</div> */}
             </>
           )}
           {/* HOW IT WORKS */}
