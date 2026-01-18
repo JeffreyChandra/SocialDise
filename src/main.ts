@@ -12,7 +12,7 @@ async function bootstrap() {
     // Ganti dengan port lokal frontend Anda yang sebenarnya!
     origin: [
       'http://localhost:3001', // Ganti 3001 ke port lokal Anda yang benar
-      'https://fortunate-youthfulness-production.up.railway.app'
+      'straightforward-jane-socialdise-726976fd.koyeb.app/'
     ],
     //Testing
     // Atau, untuk mengizinkan SEMUA origin (HANYA UNTUK DEVELOPMENT LOKAL!):
