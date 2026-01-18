@@ -10,13 +10,15 @@ import { firstValueFrom } from 'rxjs';
 import FormData from 'form-data';
 
 export interface DetectionResult {
-  score: number;
+  deepfakeScore: number;
+  genaiScore: number;
   message: string;
 }
 
 @Injectable()
 export class DeepfakeService {
   private readonly DEEPFAKE_THRESHOLD = 0.4;
+  private readonly GENAI_THRESHOLD = 0.4;
 
   constructor(
     private readonly httpService: HttpService,
@@ -37,7 +39,9 @@ export class DeepfakeService {
       );
     }
 
-    const isSafe = detectionResult.score <= this.DEEPFAKE_THRESHOLD;
+    const isSafe =
+      detectionResult.deepfakeScore <= this.DEEPFAKE_THRESHOLD &&
+      detectionResult.genaiScore <= this.GENAI_THRESHOLD;
 
     let fileInfo: {
       url: string;
@@ -90,11 +94,13 @@ export class DeepfakeService {
         }),
       );
 
-      const score = resp.data?.type?.deepfake ?? 0;
+      const deepfakeScore = resp.data?.type?.deepfake ?? 0;
+      const genaiScore = resp.data?.type?.ai_generated ?? 0;
 
       return {
-        score: score,
-        message: `Image terdeteksi ${score * 100}% deepfake.`,
+        deepfakeScore,
+        genaiScore,
+        message: `Image: ${(deepfakeScore * 100).toFixed(1)}% deepfake, ${(genaiScore * 100).toFixed(1)}% AI-generated.`,
       };
     } catch (error) {
       this.handleSightengineError(error);
@@ -121,12 +127,15 @@ export class DeepfakeService {
         );
       }
 
-      const frameScores = frames.map((frame: any) => frame.type.deepfake);
-      const maxScore = Math.max(...frameScores);
+      const deepfakeScores = frames.map((frame: any) => frame.type?.deepfake ?? 0);
+      const genaiScores = frames.map((frame: any) => frame.type?.ai_generated ?? 0);
+      const maxDeepfake = Math.max(...deepfakeScores);
+      const maxGenai = Math.max(...genaiScores);
 
       return {
-        score: maxScore,
-        message: `Video terdeteksi ${maxScore * 100}% deepfake (skor tertinggi dari ${frames.length} frame).`,
+        deepfakeScore: maxDeepfake,
+        genaiScore: maxGenai,
+        message: `Video: ${(maxDeepfake * 100).toFixed(1)}% deepfake, ${(maxGenai * 100).toFixed(1)}% AI-generated (dari ${frames.length} frame).`,
       };
     } catch (error) {
       this.handleSightengineError(error);
@@ -139,7 +148,7 @@ export class DeepfakeService {
       filename: file.originalname,
       contentType: file.mimetype,
     });
-    form.append('models', 'deepfake');
+    form.append('models', 'deepfake,genai');
     form.append('api_user', this.configService.get('SIGHTENGINE_API_USER'));
     form.append('api_secret', this.configService.get('SIGHTENGINE_API_SECRET'));
     return form;

@@ -2,6 +2,8 @@
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 import { Comment } from './comment.entity';
 import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
@@ -10,6 +12,8 @@ import { Post } from '../post/post.entity'; // Diperlukan untuk injeksi Post Rep
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment, Post]), // Daftarkan kedua entitas
+    HttpModule,
+    ConfigModule,
   ],
   providers: [CommentService],
   controllers: [CommentController],
