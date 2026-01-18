@@ -7,6 +7,7 @@ import {
   Image,
   Send,
   Upload,
+  User,
   X,
 } from "lucide-react";
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
@@ -86,15 +87,16 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
     setFile(null);
     setPreview(null);
     if (inputRef.current) inputRef.current.value = "";
-    setAnalyzeResult({ isSafe: false, detection: "", url: "" });
+    setAnalyzeResult({ isSafe: false, deepfakeScore: 0, genaiScore: 0, url: "" });
     setIsDurationExceeded(false);
   };
 
   const [analyzeResult, setAnalyzeResult] = useState<{
     isSafe: boolean;
-    detection: string;
+    deepfakeScore: number;
+    genaiScore: number;
     url: string;
-  }>({ isSafe: false, detection: "", url: "" });
+  }>({ isSafe: false, deepfakeScore: 0, genaiScore: 0, url: "" });
 
   const handlePost = async () => {
     try {
@@ -105,7 +107,8 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           content: caption,
           mediaUrl: analyzeResult.url,
           userId: JSON.parse(localStorage.getItem("user")!).id,
-          trustedScore: Number(analyzeResult.detection) * 100,
+          trustedScore: 1 - ((analyzeResult.deepfakeScore + analyzeResult.genaiScore) / 2),
+          isSafe: analyzeResult.isSafe,
         },
         {
           headers: {
@@ -120,9 +123,10 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
     }
   };
   const [colorScore, setColorScore] = useState("var(--color-status-success)");
-  const changeColorBasedOnScore = (score: string) => {
-    const scoreValue = 100 - Number(score) * 100;
-    if (scoreValue < 30) {
+  const changeColorBasedOnScore = (deepfake: number, genai: number) => {
+    const maxScore = Math.max(deepfake, genai);
+    const trustScore = 100 - maxScore * 100;
+    if (trustScore < 30) {
       setColorScore("var(--color-status-danger)");
     } else {
       setColorScore("var(--color-status-success)");
@@ -149,10 +153,11 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
       console.log("ini hasil res", res.data);
       setAnalyzeResult({
         isSafe: res.data.isSafe,
-        detection: res.data.detection.score,
-        url: "",
+        deepfakeScore: res.data.detection.deepfakeScore,
+        genaiScore: res.data.detection.genaiScore,
+        url: res.data.fileInfo?.url || "",
       });
-      changeColorBasedOnScore(res.data.detection.score);
+      changeColorBasedOnScore(res.data.detection.deepfakeScore, res.data.detection.genaiScore);
       console.log("Success:", res.data);
     } catch (error) {
       console.error("Error:", error);
@@ -172,7 +177,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
               posting
             </div>
           </div>
-          {/* UPLOAD MEDIA */}
           <div
             onClick={() => {
               inputRef.current?.click();
@@ -207,7 +211,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           </div>
           {preview && file && (
             <>
-              {/* PREVIEW */}
               <div
                 className={`shadow bg-white text-small rounded-xl mb-4 ${
                   isPreviewClosing
@@ -247,7 +250,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                   </div>
                 </div>
               </div>
-              {/* ANALYZE WITH AI */}
               <div
                 onClick={() => {
                   setIsAnalyzingComplete(false);
@@ -261,7 +263,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           )}
           {isDurationExceeded && (
             <>
-              {/* DURATION EXCEEDED WARNING */}
               <div className="mb-4 bg-red-100 border border-red-400 text-red-800 text-small p-3 rounded-lg animate-fadeIn-enter">
                 <div className="font-semibold mb-1">Duration Exceeded</div>
                 Videos longer than 60 seconds cannot be analyzed. Please upload
@@ -271,7 +272,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           )}
           {isAnalyzing && (
             <>
-              {/* ANALYZING CONTENT */}
               <div className="mb-4 bg-white shadow rounded-xl text-small p-3">
                 <div className="flex items-center gap-2 mb-3">
                   <Brain className="w-4.5 h-4.5 stroke-status-info animate-spin" />
@@ -301,7 +301,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           )}
           {isAnalyzingComplete && (
             <>
-              {/* AI ANALYSIS COMPLETE */}
               <div
                 style={{ boxShadow: `0px 4px 15px -3px ${colorScore}` }}
                 className="mb-4 bg-white shadow text-small p-3 rounded-xl"
@@ -325,25 +324,47 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                         ? "#13843c"
                         : "#841313",
                   }}
-                  className="border px-2 py-1 rounded-xl mb-2 w-fit animate-scaleUp-enter"
+                  className="border px-2 py-1 rounded-xl mb-3 w-fit animate-scaleUp-enter"
                 >
-                  Genuine {100 - Number(analyzeResult.detection) * 100}%
+                  {analyzeResult.isSafe ? "Content Verified Safe" : "Potential AI Content Detected"}
                 </div>
+
                 <div className="flex justify-between text-verySmall mb-1">
-                  <div>Trust Score</div>
-                  <div style={{ color: colorScore }} className="font-semibold">
-                    {100 - Number(analyzeResult.detection) * 100}
+                  <div className="flex items-center gap-1">
+                    <User className="w-3 h-3" /> Deepfake Score
+                  </div>
+                  <div style={{ color: analyzeResult.deepfakeScore > 0.3 ? "var(--color-status-danger)" : "var(--color-status-success)" }} className="font-semibold">
+                    {(analyzeResult.deepfakeScore * 100).toFixed(1)}%
                   </div>
                 </div>
                 <div className="bg-neutral-border h-1 rounded-full mb-3 overflow-hidden">
                   <div
                     style={{
-                      width: 100 - Number(analyzeResult.detection) * 100 + "%",
-                      backgroundColor: colorScore,
+                      width: analyzeResult.deepfakeScore * 100 + "%",
+                      backgroundColor: analyzeResult.deepfakeScore > 0.3 ? "var(--color-status-danger)" : "var(--color-status-success)",
                     }}
                     className="h-full animate-fill-bar"
                   ></div>
                 </div>
+
+                <div className="flex justify-between text-verySmall mb-1">
+                  <div className="flex items-center gap-1">
+                    <Brain className="w-3 h-3" /> AI-Generated Score
+                  </div>
+                  <div style={{ color: analyzeResult.genaiScore > 0.3 ? "var(--color-status-danger)" : "var(--color-status-success)" }} className="font-semibold">
+                    {(analyzeResult.genaiScore * 100).toFixed(1)}%
+                  </div>
+                </div>
+                <div className="bg-neutral-border h-1 rounded-full mb-3 overflow-hidden">
+                  <div
+                    style={{
+                      width: analyzeResult.genaiScore * 100 + "%",
+                      backgroundColor: analyzeResult.genaiScore > 0.3 ? "var(--color-status-danger)" : "var(--color-status-success)",
+                    }}
+                    className="h-full animate-fill-bar"
+                  ></div>
+                </div>
+
                 <div
                   style={{
                     backgroundColor:
@@ -359,7 +380,9 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                 >
                   <Check className="w-3 h-3" />{" "}
                   {colorScore === "var(--color-status-danger)"
-                    ? "This content appears to be AI-generated."
+                    ? analyzeResult.deepfakeScore > analyzeResult.genaiScore
+                      ? "This content appears to be a deepfake."
+                      : "This content appears to be fully AI-generated."
                     : "This content appears to be authentic and safe to post."}
                 </div>
                 <div className="text-verySmall mb-1 flex items-center gap-1">
@@ -367,17 +390,25 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
                 </div>
                 {colorScore === "var(--color-status-danger)" ? (
                   <ul className="list-disc list-inside space-y-1 pl-4 text-verySmall ">
-                    <li>Inconsistent facial features detected</li>
-                    <li>Background anomalies found</li>
-                    <li>Signs of digital manipulation present</li>
-                    <li>Metadata validation failed</li>
+                    {analyzeResult.deepfakeScore > 0.3 && (
+                      <>
+                        <li>Inconsistent facial features detected</li>
+                        <li>Signs of face manipulation present</li>
+                      </>
+                    )}
+                    {analyzeResult.genaiScore > 0.3 && (
+                      <>
+                        <li>AI generation patterns detected</li>
+                        <li>Synthetic content indicators found</li>
+                      </>
+                    )}
                   </ul>
                 ) : (
                   <ul className="list-disc list-inside space-y-1 pl-4 text-verySmall">
                     <li>Facial features analysis completed</li>
-                    <li>Background consistency verified</li>
+                    <li>AI generation check passed</li>
                     <li>No digital manipulation detected</li>
-                    <li>Metadata validation passed</li>
+                    <li>Content authenticity verified</li>
                   </ul>
                 )}
               </div>
@@ -385,7 +416,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
           )}
           {isAnalyzingComplete && (
             <>
-              {/* BUTTON CANCEL AND POST NOW */}
               <div className="flex text-small gap-2 mb-4">
                 <button
                   onClick={() => {
@@ -406,7 +436,6 @@ const UploadPage = ({ setSelectedNav }: UploadPage) => {
               </div>
             </>
           )}
-          {/* HOW IT WORKS */}
           <div className="bg-blue-50 border border-blue-300 text-blue-900 p-3 rounded-lg animate-fadeUpDelay-enter opacity-0 ">
             <div className="text-small font-medium mb-1">How it works</div>
             <ul className="text-verySmall list-disc list-inside space-y-1 marker:text-blue-500">

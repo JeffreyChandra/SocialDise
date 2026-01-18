@@ -6,6 +6,13 @@ interface User {
   name: string;
   password: string;
 }
+
+interface DetectionResult {
+  deepfakeScore: number;
+  genaiScore: number;
+  message: string;
+}
+
 interface Post {
   comments: [];
   content: string;
@@ -14,8 +21,9 @@ interface Post {
   mediaUrl: string;
   title: string;
   trustedScore: string;
+  isSafe: boolean;
   user: User;
   userId?: number;
 }
 
-export type { User, Post };
+export type { User, Post, DetectionResult };
