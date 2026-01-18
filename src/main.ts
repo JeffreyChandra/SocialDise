@@ -10,13 +10,7 @@ async function bootstrap() {
   // 1. Tambahkan Konfigurasi CORS
   app.enableCors({
     // Ganti dengan port lokal frontend Anda yang sebenarnya!
-    origin: [
-      'http://localhost:3001', // Ganti 3001 ke port lokal Anda yang benar
-      'straightforward-jane-socialdise-726976fd.koyeb.app/'
-    ],
-    //Testing
-    // Atau, untuk mengizinkan SEMUA origin (HANYA UNTUK DEVELOPMENT LOKAL!):
-    // origin: '*', 
+    origin: true,
     
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Penting jika Anda menggunakan cookies/session/authorization headers
