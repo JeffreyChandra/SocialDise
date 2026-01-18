@@ -30,7 +30,7 @@ const PostCard = ({ post }: { post: Post }) => {
             <div className="font-semibold">{post.user.name}</div>
             <div className="text-neutral-textSecondary">
               {post.user.email}{" "}
-              <span className="text-[0.4rem] align-middle">&bull;</span> 2h ago
+              <span className="text-[0.4rem] align-middle">&bull;</span> 1h ago
             </div>
           </div>
         </div>
